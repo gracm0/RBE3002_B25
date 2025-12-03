@@ -1,3 +1,4 @@
+# Grace Mahoney
 import numpy as np
 
 # parameters
@@ -10,6 +11,7 @@ sigma_hit = 0.2
 z_max = 7.0
 eps = 1e-6
 
+# Exercise 2
 def p_hit(actual, predicted):
     if 0 <= actual <= z_max:
         a = 1.0 / (np.sqrt(2 * np.pi) * sigma_hit)
@@ -35,6 +37,15 @@ def p_max(actual, predicted):
 def beam_model(z, z_star):
     return (a_hit * p_hit(z, z_star)) + (a_short * p_short(z, z_star)) + (a_max * p_max(z, z_star)) + (a_rand * p_rand(z, z_star))
         
+
+# Exercise 3
+def calc_weight(probabilities):
+    weight = 1.0
+    for p in probabilities:
+        weight *= p
+    return weight
+        
+
 def main():
     real_readings = [2.2, 4.67, 6.1, 7.0]
 
@@ -45,13 +56,35 @@ def main():
         [5.0, 2.0, 3.0, 10.0]                                   # p4
     ]
 
+    probabilities = []
+    raw_weight = []
+
     print("P\t" + "\t".join([f"z={z:.2f}   " for z in real_readings]))
     for i in range(len(real_readings)):
         print(f"{i+1}", end="")
+        temp = []
         for j in range(len(real_readings)):
             prob = beam_model(real_readings[j], particles[i][j])
+            temp.append(prob)
             print(f"\t{prob:.6f}", end="")
+        probabilities.append(temp)
         print()
+
+    for row in probabilities:
+        raw_weight.append(calc_weight(row))
+    
+    total = sum(raw_weight)
+    
+    norm_weight = [w / total for w in raw_weight]
+
+    print("\nParticle:\tRaw Weight\tNormalized Weight")
+    for i in range(len(raw_weight)):
+        print(f"    P{i+1}\t\t", end="")
+        print(f"{raw_weight[i]:.10f}\t", end="")
+        print(f"{norm_weight[i]:.10f}")
+        print()
+
+
 
 
 if __name__ == "__main__":
